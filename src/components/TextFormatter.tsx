@@ -16,17 +16,19 @@ export const TextFormatter = ({ value, onChange, onFormat }: TextFormatterProps)
   };
 
   return (
-    <div className="space-y-2">
-      <Label htmlFor="input-text" className="text-sm font-medium">
-        Cole ou digite seu texto aqui (Ctrl+Enter para formatar)
+    <div className="space-y-3">
+      <Label htmlFor="input-text" className="text-base font-bold text-gray-800">
+        Digite ou cole seu texto aqui (Ctrl+Enter para criar layout)
       </Label>
       <Textarea
         id="input-text"
-        placeholder="Cole seu texto aqui para formatação acadêmica..."
+        placeholder="Cole ou digite seu texto aqui para criar um layout estilo magazine...
+
+Dica: O primeiro parágrafo será usado como título principal da matéria."
         value={value}
         onChange={(e) => onChange(e.target.value)}
         onKeyDown={handleKeyDown}
-        className="min-h-96 resize-none font-mono text-sm"
+        className="min-h-80 resize-none text-sm border-2 focus:border-orange-500 focus:ring-orange-500"
         style={{ fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", monospace' }}
       />
     </div>

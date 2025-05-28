@@ -1,32 +1,34 @@
 
 import { useState } from 'react';
 import { TextFormatter } from '@/components/TextFormatter';
-import { PreviewPane } from '@/components/PreviewPane';
-import { FileText, Download, Copy, Eye } from 'lucide-react';
+import { MagazinePreview } from '@/components/MagazinePreview';
+import { FileText, Download, Copy, Eye, Palette } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 
 const Index = () => {
   const [inputText, setInputText] = useState('');
   const [formattedText, setFormattedText] = useState('');
   const [showPreview, setShowPreview] = useState(false);
+  const [selectedTheme, setSelectedTheme] = useState('orange');
 
   const wordCount = inputText.trim() ? inputText.trim().split(/\s+/).length : 0;
   const charCount = inputText.length;
 
+  const themes = [
+    { name: 'orange', color: 'bg-orange-500', label: 'Laranja' },
+    { name: 'green', color: 'bg-green-500', label: 'Verde' },
+    { name: 'yellow', color: 'bg-yellow-500', label: 'Amarelo' },
+    { name: 'pink', color: 'bg-pink-500', label: 'Rosa' },
+    { name: 'blue', color: 'bg-blue-500', label: 'Azul' },
+    { name: 'purple', color: 'bg-purple-500', label: 'Roxo' }
+  ];
+
   const handleFormatText = () => {
     if (!inputText.trim()) return;
     
-    // Aplicar formatação básica mantendo parágrafos
-    const paragraphs = inputText.split('\n\n').filter(p => p.trim());
-    const formatted = paragraphs.map(paragraph => {
-      const trimmed = paragraph.trim().replace(/\n/g, ' ').replace(/\s+/g, ' ');
-      return `    ${trimmed}`; // Recuo de primeira linha
-    }).join('\n\n');
-    
-    setFormattedText(formatted);
+    setFormattedText(inputText.trim());
     setShowPreview(true);
   };
 
@@ -34,7 +36,6 @@ const Index = () => {
     if (!formattedText) return;
     try {
       await navigator.clipboard.writeText(formattedText);
-      // Aqui você poderia adicionar um toast de sucesso
     } catch (err) {
       console.error('Erro ao copiar texto:', err);
     }
@@ -48,31 +49,45 @@ const Index = () => {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'documento_formatado.doc';
+      a.download = 'revista_formatada.doc';
       a.click();
       URL.revokeObjectURL(url);
-    } else if (format === 'pdf') {
-      // Para implementação completa do PDF, seria necessário usar uma biblioteca como jsPDF
-      console.log('Download PDF - implementação futura');
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-green-50">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center gap-3">
-            <div className="bg-orange-500 p-2 rounded-lg">
-              <FileText className="h-6 w-6 text-white" />
+    <div className="min-h-screen bg-gray-50">
+      {/* Header Moderno */}
+      <div className="bg-white shadow-lg border-b-4 border-orange-500">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="bg-gradient-to-r from-orange-500 to-red-500 p-3 rounded-xl shadow-lg">
+                <FileText className="h-8 w-8 text-white" />
+              </div>
+              <div>
+                <h1 className="text-3xl font-black text-gray-900 uppercase tracking-tight">
+                  Editor de Revista
+                </h1>
+                <p className="text-lg text-gray-600 font-medium">
+                  Crie layouts profissionais estilo magazine
+                </p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">
-                Formatador de Texto Acadêmico
-              </h1>
-              <p className="text-sm text-gray-600">
-                Formate seu texto seguindo padrões acadêmicos profissionais
-              </p>
+            
+            <div className="flex items-center gap-2">
+              <Palette className="h-5 w-5 text-gray-600" />
+              <span className="text-sm font-medium text-gray-600">Temas:</span>
+              {themes.map((theme) => (
+                <button
+                  key={theme.name}
+                  onClick={() => setSelectedTheme(theme.name)}
+                  className={`w-8 h-8 rounded-full ${theme.color} shadow-md border-2 transition-all ${
+                    selectedTheme === theme.name ? 'border-gray-800 scale-110' : 'border-white hover:scale-105'
+                  }`}
+                  title={theme.label}
+                />
+              ))}
             </div>
           </div>
         </div>
@@ -80,133 +95,151 @@ const Index = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Painel de Entrada */}
-          <Card className="p-6">
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-gray-900">
-                  Texto Original
-                </h2>
-                <div className="flex gap-2">
-                  <Badge variant="outline">{wordCount} palavras</Badge>
-                  <Badge variant="outline">{charCount} caracteres</Badge>
+          {/* Painel de Entrada - Estilo Revista */}
+          <div>
+            <Card className="bg-white shadow-xl border-0 overflow-hidden">
+              <div className={`bg-${selectedTheme}-500 p-6 text-white`}>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h2 className="text-2xl font-black uppercase tracking-wide">
+                      Texto Original
+                    </h2>
+                    <p className="text-lg opacity-90 font-medium">
+                      Digite seu conteúdo aqui
+                    </p>
+                  </div>
+                  <div className="flex gap-3">
+                    <Badge variant="secondary" className="bg-white/20 text-white border-0 text-sm font-bold">
+                      {wordCount} palavras
+                    </Badge>
+                    <Badge variant="secondary" className="bg-white/20 text-white border-0 text-sm font-bold">
+                      {charCount} chars
+                    </Badge>
+                  </div>
                 </div>
               </div>
               
-              <TextFormatter
-                value={inputText}
-                onChange={setInputText}
-                onFormat={handleFormatText}
-              />
-              
-              <div className="flex gap-2">
-                <Button 
-                  onClick={handleFormatText}
-                  disabled={!inputText.trim()}
-                  className="bg-orange-500 hover:bg-orange-600 text-white"
-                >
-                  <FileText className="h-4 w-4 mr-2" />
-                  Formatar Texto
-                </Button>
+              <div className="p-6">
+                <TextFormatter
+                  value={inputText}
+                  onChange={setInputText}
+                  onFormat={handleFormatText}
+                />
                 
-                <Button
-                  variant="outline"
-                  onClick={() => setShowPreview(!showPreview)}
-                  disabled={!formattedText}
-                >
-                  <Eye className="h-4 w-4 mr-2" />
-                  {showPreview ? 'Ocultar' : 'Visualizar'}
-                </Button>
+                <div className="flex gap-3 mt-6">
+                  <Button 
+                    onClick={handleFormatText}
+                    disabled={!inputText.trim()}
+                    className={`bg-${selectedTheme}-500 hover:bg-${selectedTheme}-600 text-white font-bold px-6 py-3 text-lg shadow-lg`}
+                  >
+                    <FileText className="h-5 w-5 mr-2" />
+                    Criar Layout
+                  </Button>
+                  
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowPreview(!showPreview)}
+                    disabled={!formattedText}
+                    className="border-2 font-bold px-6 py-3"
+                  >
+                    <Eye className="h-5 w-5 mr-2" />
+                    {showPreview ? 'Ocultar' : 'Visualizar'}
+                  </Button>
+                </div>
               </div>
-            </div>
-          </Card>
+            </Card>
+          </div>
 
-          {/* Painel de Resultado */}
-          <Card className="p-6">
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-gray-900">
-                  Texto Formatado
-                </h2>
-                {formattedText && (
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={handleCopyText}
-                    >
-                      <Copy className="h-4 w-4 mr-1" />
-                      Copiar
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleDownload('doc')}
-                    >
-                      <Download className="h-4 w-4 mr-1" />
-                      .DOC
-                    </Button>
+          {/* Painel de Preview - Estilo Revista */}
+          <div>
+            <Card className="bg-white shadow-xl border-0 overflow-hidden">
+              <div className={`bg-${selectedTheme}-500 p-6 text-white`}>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h2 className="text-2xl font-black uppercase tracking-wide">
+                      Preview Magazine
+                    </h2>
+                    <p className="text-lg opacity-90 font-medium">
+                      Layout estilo revista
+                    </p>
+                  </div>
+                  {formattedText && (
+                    <div className="flex gap-2">
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={handleCopyText}
+                        className="bg-white/20 text-white border-0 hover:bg-white/30 font-bold"
+                      >
+                        <Copy className="h-4 w-4 mr-1" />
+                        Copiar
+                      </Button>
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => handleDownload('doc')}
+                        className="bg-white/20 text-white border-0 hover:bg-white/30 font-bold"
+                      >
+                        <Download className="h-4 w-4 mr-1" />
+                        .DOC
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="p-6">
+                {showPreview && formattedText ? (
+                  <MagazinePreview text={formattedText} theme={selectedTheme} />
+                ) : (
+                  <div className="h-96 border-2 border-dashed border-gray-300 rounded-xl flex items-center justify-center bg-gray-50">
+                    <div className="text-center text-gray-500">
+                      <FileText className="h-16 w-16 mx-auto mb-4 opacity-30" />
+                      <p className="text-xl font-bold text-gray-400">Preview da Revista</p>
+                      <p className="text-sm text-gray-400">Digite seu texto e clique em "Criar Layout"</p>
+                    </div>
                   </div>
                 )}
               </div>
-
-              <Separator />
-
-              {showPreview && formattedText ? (
-                <PreviewPane text={formattedText} />
-              ) : (
-                <div className="h-96 border-2 border-dashed border-gray-200 rounded-lg flex items-center justify-center">
-                  <div className="text-center text-gray-500">
-                    <FileText className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                    <p>O texto formatado aparecerá aqui</p>
-                    <p className="text-sm">Digite seu texto e clique em "Formatar Texto"</p>
-                  </div>
-                </div>
-              )}
-            </div>
-          </Card>
+            </Card>
+          </div>
         </div>
 
-        {/* Especificações de Formatação */}
-        <Card className="mt-8 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            Especificações de Formatação Aplicadas
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div className="space-y-2">
-              <div className="bg-orange-100 p-3 rounded-lg">
-                <h4 className="font-medium text-orange-800">Margem</h4>
-                <p className="text-sm text-orange-600">2cm em todos os lados</p>
+        {/* Características do Layout */}
+        <Card className="mt-8 bg-white shadow-xl border-0 overflow-hidden">
+          <div className={`bg-gradient-to-r from-${selectedTheme}-500 to-${selectedTheme}-600 p-6 text-white`}>
+            <h3 className="text-2xl font-black uppercase tracking-wide mb-2">
+              Características do Layout Magazine
+            </h3>
+            <p className="text-lg opacity-90">
+              Design moderno inspirado em revistas profissionais
+            </p>
+          </div>
+          <div className="p-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="bg-orange-50 p-4 rounded-lg border-l-4 border-orange-500">
+                <h4 className="font-black text-orange-800 text-lg">Layout Colorido</h4>
+                <p className="text-sm text-orange-600 font-medium">Seções com cores vibrantes e contrastantes</p>
               </div>
-            </div>
-            <div className="space-y-2">
-              <div className="bg-green-100 p-3 rounded-lg">
-                <h4 className="font-medium text-green-800">Fonte</h4>
-                <p className="text-sm text-green-600">Times New Roman, 12pt</p>
+              <div className="bg-green-50 p-4 rounded-lg border-l-4 border-green-500">
+                <h4 className="font-black text-green-800 text-lg">Tipografia Bold</h4>
+                <p className="text-sm text-green-600 font-medium">Títulos grandes e impactantes</p>
               </div>
-            </div>
-            <div className="space-y-2">
-              <div className="bg-blue-100 p-3 rounded-lg">
-                <h4 className="font-medium text-blue-800">Espaçamento</h4>
-                <p className="text-sm text-blue-600">Entre linhas: 1.5</p>
+              <div className="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500">
+                <h4 className="font-black text-blue-800 text-lg">Grid Moderno</h4>
+                <p className="text-sm text-blue-600 font-medium">Organização visual profissional</p>
               </div>
-            </div>
-            <div className="space-y-2">
-              <div className="bg-purple-100 p-3 rounded-lg">
-                <h4 className="font-medium text-purple-800">Alinhamento</h4>
-                <p className="text-sm text-purple-600">Texto justificado</p>
+              <div className="bg-purple-50 p-4 rounded-lg border-l-4 border-purple-500">
+                <h4 className="font-black text-purple-800 text-lg">Elementos Visuais</h4>
+                <p className="text-sm text-purple-600 font-medium">Ícones e seções destacadas</p>
               </div>
-            </div>
-            <div className="space-y-2">
-              <div className="bg-pink-100 p-3 rounded-lg">
-                <h4 className="font-medium text-pink-800">Recuo</h4>
-                <p className="text-sm text-pink-600">Primeira linha: 1.25cm</p>
+              <div className="bg-pink-50 p-4 rounded-lg border-l-4 border-pink-500">
+                <h4 className="font-black text-pink-800 text-lg">Responsivo</h4>
+                <p className="text-sm text-pink-600 font-medium">Adaptável a diferentes telas</p>
               </div>
-            </div>
-            <div className="space-y-2">
-              <div className="bg-yellow-100 p-3 rounded-lg">
-                <h4 className="font-medium text-yellow-800">Páginas</h4>
-                <p className="text-sm text-yellow-600">Numeração automática</p>
+              <div className="bg-yellow-50 p-4 rounded-lg border-l-4 border-yellow-500">
+                <h4 className="font-black text-yellow-800 text-lg">Temas Customizáveis</h4>
+                <p className="text-sm text-yellow-600 font-medium">6 paletas de cores diferentes</p>
               </div>
             </div>
           </div>
